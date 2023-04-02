@@ -2,9 +2,13 @@ package creature.player;
 import javax.swing.JOptionPane;
 
 import creature.Creature;
-import creature.player.body.*;
 import inventory.Inventory;
 import inventory.item.*;
+import inventory.item.armor.*;
+import inventory.item.armor.bodyPart.Chest;
+import inventory.item.armor.bodyPart.Feet;
+import inventory.item.armor.bodyPart.Head;
+import inventory.item.armor.bodyPart.Legs;
 import main.App;
 
 public class Player extends Creature{

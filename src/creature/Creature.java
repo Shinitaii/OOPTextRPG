@@ -47,16 +47,35 @@ public class Creature {
     
     //custom methods
 
+    public boolean isDefeated(){
+        return this.getCurrentHP() <= 0;
+    }
+
     public void normalAttack(Creature creature) { // normal attack for player
         double damageDealt = Math.round((2.0 / 3.0) * (this.getAttack() - creature.getDefense()) + (new Random().nextInt(11)));
         if(damageDealt <= -1) damageDealt = 0; 
-        creature.setCurrentHP(creature.getCurrentHP() - damageDealt);
-        JOptionPane.showMessageDialog(null, String.format("%s dealt %,.0f damage to %s!", this.getName(), damageDealt, creature.getName()), App.TITLE, JOptionPane.INFORMATION_MESSAGE);
+        if(attackHits(this.getAccuracy(), creature.getEvade())){
+            creature.receiveDamage(damageDealt);
+            JOptionPane.showMessageDialog(null, String.format("%s dealt %,.0f damage to %s!", this.getName(), damageDealt, creature.getName()), App.TITLE, JOptionPane.INFORMATION_MESSAGE);
+        } else JOptionPane.showMessageDialog(null,this.getName() + " missed!", App.TITLE, JOptionPane.INFORMATION_MESSAGE);
+        
     }
 
-    public boolean checkDefending(){
-        if(this.isDefending) return true;
-        else return false;
+    private void receiveDamage(double damage){
+        this.setCurrentHP(this.getCurrentHP() - damage);
+    }
+
+    private double calculateMissChance(int attackingAccuracy, int defendingEvasion) {
+        double missChance = attackingAccuracy - defendingEvasion;
+        if (missChance > 0) return missChance / 100;
+        else return 0;
+    }
+
+    private boolean attackHits(int accuracy, int evasion) {
+        double missChance = calculateMissChance(accuracy, evasion);
+        double modifiedHitRate = 1.00 - missChance;
+        double random = Math.random();
+        return random < modifiedHitRate;
     }
 
     public void defend(){

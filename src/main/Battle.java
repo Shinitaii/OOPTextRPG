@@ -22,7 +22,7 @@ public class Battle {
         Enemy enemy = new Enemy(player);
         JOptionPane.showMessageDialog(null, "You encountered " + enemy.getName() + "!", TITLE, JOptionPane.WARNING_MESSAGE);
         Object[] playerOptions = {"Normal Attack", "Defend", "Skill", "Item", "Run"};
-        while(player.getCurrentHP() > 0 && enemy.getCurrentHP() > 0 && playerChoice != 4){
+        while(!player.isDefeated() && !enemy.isDefeated() && playerChoice != 4){
             String status = String.format("Turn %d\n\n%s | HP: %,.0f / %,.0f | MP: %,.0f / %,.0f\n%s | HP: %,.0f / %,.0f | MP: %,.0f / %,.0f\n\nWhat do you want to do?", turn, player.getName(), player.getCurrentHP(), player.getMaxHP(), player.getCurrentMP(), player.getMaxMP(), enemy.getName(), enemy.getCurrentHP(), enemy.getMaxHP(), enemy.getCurrentMP(), enemy.getMaxMP());
             playerChoice = JOptionPane.showOptionDialog(null, status, TITLE, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, playerOptions, playerOptions[0]);
             switch(playerChoice){
@@ -36,21 +36,24 @@ public class Battle {
             enemy.enemyChoice(player);
             player.resetDefend();
 
-            if(enemy.getCurrentHP() <= 0) {
-                String message = String.format("You won!\n\nYou gained %,.0f EXP\nYou have received %d gold!", enemy.dropEXP(player), enemy.dropGold());
-                player.setCurrentEXP(player.getCurrentEXP() + enemy.dropEXP(player));
-                player.setGold(player.getGold() + enemy.dropGold());
-                player.checkEXP();
-                JOptionPane.showMessageDialog(null, message, TITLE, JOptionPane.INFORMATION_MESSAGE);
-                break;
-            } else if(player.getCurrentHP() <= 0) {
-                String message = String.format("You lost! %s happened to steal %d of your gold!", enemy.getName(), enemy.takeGold(player));
-                player.setGold(player.getGold() - enemy.takeGold(player));
-                JOptionPane.showMessageDialog(null, message, TITLE, JOptionPane.WARNING_MESSAGE);
-                break;
-            }
+            if(enemy.isDefeated()) victory(enemy);
+            if(player.isDefeated()) defeat(enemy);
             turn++;
         }
         App.menu();
+    }
+
+    private void victory(Enemy enemy){
+        String message = String.format("You won!\n\nYou gained %,.0f EXP\nYou have received %d gold!", enemy.dropEXP(player), enemy.dropGold());
+        player.setCurrentEXP(player.getCurrentEXP() + enemy.dropEXP(player));
+        player.setGold(player.getGold() + enemy.dropGold());
+        player.checkEXP();
+        JOptionPane.showMessageDialog(null, message, TITLE, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void defeat(Enemy enemy){
+        String message = String.format("You lost! %s happened to steal %d of your gold!", enemy.getName(), enemy.takeGold(player));
+        player.setGold(player.getGold() - enemy.takeGold(player));
+        JOptionPane.showMessageDialog(null, message, TITLE, JOptionPane.WARNING_MESSAGE);
     }
 }
